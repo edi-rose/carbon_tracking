@@ -7,10 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-driver = webdriver.Safari()
 
-
-def getCarbonPrice():
+def getCarbonPrice(driver):
     driver.get("https://commtrade.co.nz")
     try:
         cp_raw = WebDriverWait(driver, 20).until(
@@ -19,7 +17,7 @@ def getCarbonPrice():
     finally:
         return cp_raw
 
-def getSaltSharePrice():   
+def getSaltSharePrice(driver):   
     driver.get("https://www.nzx.com/instruments/CO2")
     try:
         ss = WebDriverWait(driver, 10).until(
@@ -29,11 +27,13 @@ def getSaltSharePrice():
         return ss
 
 def getPrices():
-    try: cp_raw= getCarbonPrice()
-    finally: ss = getSaltSharePrice()
+    driver = getDriver()
+    try: cp_raw= getCarbonPrice(driver)
+    finally: ss = getSaltSharePrice(driver)
     v=  [ss, cp_raw]
     driver.close()
     return v
 
-##print(getSaltSharePrice())
-
+def getDriver():
+    return webdriver.Safari()
+    
