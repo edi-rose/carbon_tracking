@@ -1,8 +1,9 @@
 import pymysql as db
+import password
 
 def insertCarbonPrice(price, diff):
     connection = connectDB()
-    cursor= connection.cursor(buffered=True)
+    cursor= connection.cursor()
     cursor.callproc('insert_carbon',[price, diff])
     connection.commit()
     disconnectDB(connection)
@@ -10,7 +11,7 @@ def insertCarbonPrice(price, diff):
 
 def insertSaltPrice(price, diff):
     connection = connectDB()
-    cursor = connection.cursor(buffered=True)
+    cursor = connection.cursor()
     cursor.callproc('insert_salt',[price, diff])
     connection.commit()
     disconnectDB(connection)
@@ -47,9 +48,8 @@ def getLatestSaltFromDB():
     
 
 def connectDB():
-    connection = db.connect(host="localhost", port=3306, user="root", password="Th3B3llJar", database="carbon_market_schema")
+    connection = db.connect(host="localhost", port=3306, user="root", password=password.getPassword(), database="carbon_market_schema")
     if connection is not None:
-        print('db connected')
         return connection
 
 def disconnectDB(connection):
