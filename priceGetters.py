@@ -28,12 +28,13 @@ def getSaltSharePrice(driver):
 
 def getPrices():
     driver = getDriver()
-    try: cp_raw= getCarbonPrice(driver)
-    finally: ss = getSaltSharePrice(driver)
-    v=  [ss, cp_raw]
-    driver.close()
+    try: 
+        cp_raw= getCarbonPrice(driver)
+    finally: 
+        ss = getSaltSharePrice(driver)
+        v=  [ss, cp_raw]
+        driver.close()
     return v
 
 def getDriver():
     return webdriver.Safari()
-    

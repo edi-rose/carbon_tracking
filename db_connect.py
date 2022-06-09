@@ -1,18 +1,24 @@
 import pymysql as db
 import password
 import time
+import calculations as calcs
 
-def insertCarbonPrice(price, diff):
+def insertCarbonPrice(carbon_current, carbon_previous, salt_price):
     connection = connectDB()
     cursor= connection.cursor()
+    salt_estimate_standard = calcs.estimateNextSaltPrice(carbon_current, carbon_previous, salt_price)
+    salt_estimate_thomas = calcs.estimateNextSaltPriceThomas(carbon_current, carbon_previous, salt_price)
+    diff = carbon_current - carbon_previous
+    print(salt_estimate_standard)
+    print(salt_estimate_thomas)
     try: 
-        cursor.callproc('insert_carbon',[price, diff])
+        cursor.callproc('insert_carbon',[carbon_current, diff, salt_estimate_standard, salt_estimate_thomas])
     except: 
         print('error in insertCarbonPrice at: ', time.now)
         connection.rollback()
     else: 
         connection.commit()
-    disconnectDB(connection)
+        disconnectDB(connection)
     return
 
 def insertSaltPrice(price, diff):
@@ -48,12 +54,9 @@ def getLatestCarbonFromDB():
         #hack for first row
         return [0,0,0,0,0] 
 
-
-
 def getLatestSaltFromDB():
     connection = connectDB()
-    cursor= connection.cursor()
-    
+    cursor= connection.cursor()   
     try: 
         cursor.callproc('get_latest_salt')
     except:

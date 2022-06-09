@@ -20,6 +20,7 @@ def listen():
 def GetAndRefineNewPrices():
     t = getter.getPrices()
     arr = np.array(t)
+    print(arr)
 
     ss_raw = arr[0].split()
     cp_raw = arr[1].split()
@@ -45,10 +46,9 @@ def kickOff():
 
     if carbon_current != carbon_previous: 
         print('new carbon price detected at: ', dt)
-        diff = carbon_current - carbon_previous
-        db.insertCarbonPrice(carbon_current, diff)
+        db.insertCarbonPrice(carbon_current, carbon_previous, salt_current)
     else:
         print('no new price detected, waiting 5 minutes')
     return True 
-    
+
 listen()
