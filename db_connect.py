@@ -9,8 +9,8 @@ def insertCarbonPrice(carbon_current, carbon_previous, salt_price):
     salt_estimate_standard = calcs.estimateNextSaltPrice(carbon_current, carbon_previous, salt_price)
     salt_estimate_thomas = calcs.estimateNextSaltPriceThomas(carbon_current, carbon_previous, salt_price)
     diff = carbon_current - carbon_previous
-    print(salt_estimate_standard)
-    print(salt_estimate_thomas)
+    print("standard estimate: ", salt_estimate_standard)
+    print("thomas' estimate: ", salt_estimate_thomas)
     try: 
         cursor.callproc('insert_carbon',[carbon_current, diff, salt_estimate_standard, salt_estimate_thomas])
     except: 
@@ -32,7 +32,7 @@ def insertSaltPrice(price, diff):
     else: 
         connection.commit()
         disconnectDB(connection)
-    return
+        return
 
 def getLatestCarbonFromDB():
     connection = connectDB()
@@ -49,7 +49,6 @@ def getLatestCarbonFromDB():
         for r in result:
             if r is not None:
                 disconnectDB(connection)
-                print('carbon is not none')
                 return r
         #hack for first row
         return [0,0,0,0,0] 
@@ -72,6 +71,26 @@ def getLatestSaltFromDB():
                 return r             
         #hack for empty table
         return [0,0,0,0,0]
+
+def getAllSaltFromDB():
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_all_salt')
+    except:
+        print('error in getAllSaltFromDB at: ', time.now)
+        connection.rollback()
+        disconnectDB()
+        return
+    else: 
+        result_raw = cursor.fetchall()
+        result_list = [] 
+        for r in result_raw:
+            if r is not None:
+                result_list.append(r)
+        disconnectDB(connection)
+        return result_list
+
 
 def connectDB():
     connection = db.connect(host="localhost", port=3306, user="root", password=password.getPassword(), database="carbon_market_schema")
