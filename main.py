@@ -9,25 +9,25 @@ import time
 def listen():
     day =  datetime.now().weekday() # 0 is Monday 6, is Sunday
     hour = datetime.now().time().hour
-    while 18 > hour > 7 & day < 5:  
-        marketIsOpen = getter.getCarbonIsOpen()
-        while marketIsOpen: 
+    marketIsOpen = getter.getCarbonIsOpen()
+    while True: 
+        if 18 > hour > 7 and day < 5 and marketIsOpen == True:
             print('checking for new prices')
             try:
                 kickOff()
             except:
                 print('find price failed')
-            else:
+            finally:
                 print('check complete')
                 time.sleep(300)
-    else:
-        print('market is closed')
-        time.sleep(3600)
+        else:
+            #if market is close, try again in an hour
+            print('market is closed')
+            time.sleep(3600)
 
 def GetAndRefineNewPrices():
     t = getter.getPrices()
     arr = np.array(t)
-    print(arr)
 
     ss_raw = arr[0].split()
     cp_raw = arr[1].split()
@@ -62,7 +62,7 @@ def kickOff():
             print('adding carbon price failed')
     else:
         print('no new price detected, waiting 5 minutes')
-    return True 
+        return True 
 
 #this starts erryythang
 listen()
