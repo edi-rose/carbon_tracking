@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 chrome_driver = '/Users/edirose/Desktop/drivers/chromedriver'
 options = Options()
@@ -12,6 +13,7 @@ def getCarbonIsOpen():
     driver = getHeadlessDriver()
     driver.get("https://commtrade.co.nz")
     try:  
+        time.sleep(1.5)
         isOpen = WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.ID, "marketstatus"))
         ).text
