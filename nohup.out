@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/edirose/Workplace/trading/main.py", line 1, in <module>
+    import priceGetters as getter
+  File "/Users/edirose/Workplace/trading/priceGetters.py", line 4, in <module>
+    from selenium import webdriver
+ModuleNotFoundError: No module named 'selenium'
+Traceback (most recent call last):
+  File "/Users/edirose/Workplace/trading/main.py", line 1, in <module>
+    import priceGetters as getter
+  File "/Users/edirose/Workplace/trading/priceGetters.py", line 4, in <module>
+    from selenium import webdriver
+ModuleNotFoundError: No module named 'selenium'
+nohup: main.py: No such file or directory

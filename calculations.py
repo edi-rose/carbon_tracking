@@ -20,6 +20,6 @@ def estimateNextSaltPrice(carbon_current, carbon_previous, salt_current):
     return salt_price_estimate
 
 
-# this estimate uses thomas observation that every $0.30 change in the carbon price reflects a 1c change in the salt price
+# this estimate uses thomas' observation that every x change in the carbon price reflects a 1c change in the salt price
 def estimateNextSaltPriceThomas(carbon_current, carbon_previous, salt_current):
     return salt_current + ((carbon_current - carbon_previous)/0.25)*0.01
