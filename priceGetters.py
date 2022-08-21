@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -70,4 +70,7 @@ def getPrices():
 
 
 def getHeadlessDriver():
-    return webdriver.Chrome(chrome_driver, options=options)
+    gecko_driver = '/Users/edirose/Desktop/drivers/geckodriver'
+    options = Options()
+    options.headless = True
+    return webdriver.Firefox(executable_path=gecko_driver ,options=options)

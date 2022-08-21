@@ -91,6 +91,24 @@ def getAllSaltFromDB():
         disconnectDB(connection)
         return result_list
 
+def getAllCarbonFromDB():
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_all_carbon')
+    except:
+        print('error in getAllCarbonFromDB at: ', time.now)
+        connection.rollback()
+        disconnectDB()
+        return
+    else: 
+        result_raw = cursor.fetchall()
+        result_list = [] 
+        for r in result_raw:
+            if r is not None:
+                result_list.append(r)
+        disconnectDB(connection)
+        return result_list
 
 def connectDB():
     connection = db.connect(host="localhost", port=3306, user="root", password=password.getPassword(), database="carbon_market_schema")
@@ -107,3 +125,5 @@ def disconnectDB(connection):
     else: 
         print('database was already disconnected')
         return
+
+print(getAllCarbonFromDB())
