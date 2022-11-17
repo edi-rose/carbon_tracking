@@ -5,13 +5,13 @@ import db_connect as db
 from datetime import datetime
 import time
 
-
 def listen():
+    # day/hour method doesnt work if im not in NZTS
     day =  datetime.now().weekday() # 0 is Monday 6, is Sunday
     hour = datetime.now().time().hour
     marketIsOpen = getter.getCarbonIsOpen()
     while True: 
-        if 18 > hour > 7 and day < 5 and marketIsOpen == True:
+        if marketIsOpen == True:
             print('checking for new prices')
             try:
                 kickOff()
@@ -25,6 +25,7 @@ def listen():
             print('market is closed')
             time.sleep(3600)
 
+# todo: split into get and refine functions
 def GetAndRefineNewPrices():
     t = getter.getPrices()
     arr = np.array(t)
@@ -36,15 +37,24 @@ def GetAndRefineNewPrices():
     ss = float(re.findall( r'\d+\.*\d*', ss_raw[0])[0])
     return np.array([cp,ss])
 
+def refinePrice(price):
+    raw = price.split()
+
+    refined = float(re.findall( r'\d+\.*\d*', raw[0])[0])
+    return refined
+
 
 def kickOff(): 
-    dt = datetime
+    dt = datetime.now()
     carbon_previous = db.getLatestCarbonFromDB()[2]
     salt_previous = db.getLatestSaltFromDB()[2]
 
     current_prices = GetAndRefineNewPrices()
     carbon_current = current_prices[0]
     salt_current = current_prices[1]
+
+    nta_current = refinePrice(getter.getSaltNTA())
+    nta_previous = db.getLatestNTA()[2]
 
     if salt_current != salt_previous: 
         print('new salt price detected at: ', dt)
@@ -60,6 +70,13 @@ def kickOff():
             db.insertCarbonPrice(carbon_current, carbon_previous, salt_current)
         except: 
             print('adding carbon price failed')
+
+    if nta_current != nta_previous: 
+        print('new nta price detected at: ', dt)
+        try:
+            db.insertNTA(nta_current, nta_current - nta_previous)
+        except: 
+            print('adding nta price failed')
     else:
         print('no new price detected, waiting 5 minutes')
         return True 

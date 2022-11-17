@@ -37,7 +37,6 @@ def getCarbonPrice(driver):
     except: 
         print('could not getCarbonPrice')
     finally:
-        print(cp_raw)
         return cp_raw
 
 def getSaltSharePrice(driver):   
@@ -49,7 +48,6 @@ def getSaltSharePrice(driver):
     except: 
         print('could not getSaltSharePrice')
     finally:
-        print(ss)
         return ss
 
 def getPrices():
@@ -65,7 +63,6 @@ def getPrices():
     finally: 
         v=[ss, cp_raw]
         driver.close()
-        print(v)
     return v
 
 
@@ -74,3 +71,17 @@ def getHeadlessDriver():
     options = Options()
     options.headless = True
     return webdriver.Firefox(executable_path=gecko_driver ,options=options)
+
+def getSaltNTA():   
+    driver = getHeadlessDriver()
+    driver.get("https://www.nzx.com/instruments/CO2")
+    try:
+        ss = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/section/div[2]/div/div[1]/div[3]/div/table/tbody/tr[3]/td[2]"))
+        ).text
+    except: 
+        print('could not getSaltSharePrice')
+    finally:
+        return ss
+
+

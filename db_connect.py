@@ -34,6 +34,20 @@ def insertSaltPrice(price, diff):
         disconnectDB(connection)
         return
 
+def insertNTA(nta, diff):
+    connection = connectDB()
+    cursor = connection.cursor()
+    try:
+        cursor.callproc('insert_nta',[nta, diff])
+    except: 
+        print('error in insert_nta at: ', time.now)
+        connection.rollback()
+    else: 
+        connection.commit()
+        disconnectDB(connection)
+        return
+
+
 def getLatestCarbonFromDB():
     connection = connectDB()
     cursor= connection.cursor()
@@ -72,6 +86,25 @@ def getLatestSaltFromDB():
         #hack for empty table
         return [0,0,0,0,0]
 
+def getLatestNTA():
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_latest_nta')
+    except:
+        print('error in getLatestNTA at: ', time.now)
+        connection.rollback()
+        disconnectDB()
+        return
+    else: 
+        result = cursor.fetchall()
+        for r in result:
+            if r is not None:
+                disconnectDB(connection)
+                return r             
+        #hack for empty table
+        return [0,0,0,0,0]
+
 def getAllSaltFromDB():
     connection = connectDB()
     cursor= connection.cursor()   
@@ -84,12 +117,7 @@ def getAllSaltFromDB():
         return
     else: 
         result_raw = cursor.fetchall()
-        result_list = [] 
-        for r in result_raw:
-            if r is not None:
-                result_list.append(r)
-        disconnectDB(connection)
-        return result_list
+        return result_raw
 
 def getAllCarbonFromDB():
     connection = connectDB()
@@ -103,12 +131,8 @@ def getAllCarbonFromDB():
         return
     else: 
         result_raw = cursor.fetchall()
-        result_list = [] 
-        for r in result_raw:
-            if r is not None:
-                result_list.append(r)
         disconnectDB(connection)
-        return result_list
+        return result_raw
 
 def connectDB():
     connection = db.connect(host="localhost", port=3306, user="root", password=password.getPassword(), database="carbon_market_schema")
@@ -125,5 +149,3 @@ def disconnectDB(connection):
     else: 
         print('database was already disconnected')
         return
-
-print(getAllCarbonFromDB())
