@@ -1,52 +1,59 @@
 import pymysql as db
 import password
-import time
+from datetime import datetime as dt
 import calculations as calcs
 
-def insertCarbonPrice(carbon_current, carbon_previous, salt_price):
+def insertCarbonPrice(carbon_current):
     connection = connectDB()
     cursor= connection.cursor()
-    salt_estimate_standard = calcs.estimateNextSaltPrice(carbon_current, carbon_previous, salt_price)
-    salt_estimate_thomas = calcs.estimateNextSaltPriceThomas(carbon_current, carbon_previous, salt_price)
-    diff = carbon_current - carbon_previous
-    print("standard estimate: ", salt_estimate_standard)
-    print("thomas' estimate: ", salt_estimate_thomas)
-    try: 
-        cursor.callproc('insert_carbon',[carbon_current, diff, salt_estimate_standard, salt_estimate_thomas])
+    try:  
+        cursor.callproc('insert_carbon',[carbon_current])
     except: 
-        print('error in insertCarbonPrice at: ', time.now)
+        print('error in insertCarbonPrice at: ', dt.now())
         connection.rollback()
     else: 
         connection.commit()
         disconnectDB(connection)
     return
 
-def insertSaltPrice(price, diff):
+def insertSaltPrice(price):
     connection = connectDB()
     cursor = connection.cursor()
     try:
-        cursor.callproc('insert_salt',[price, diff])
+        cursor.callproc('insert_salt',[price])
     except: 
-        print('error in insertSaltPrice at: ', time.now)
+        print('error in insertSaltPrice at: ', dt.now())
         connection.rollback()
     else: 
         connection.commit()
         disconnectDB(connection)
         return
 
-def insertNTA(nta, diff):
+def insertNTA(nta):
     connection = connectDB()
     cursor = connection.cursor()
     try:
-        cursor.callproc('insert_nta',[nta, diff])
+        cursor.callproc('insert_nta',[nta])
     except: 
-        print('error in insert_nta at: ', time.now)
+        print('error in insert_nta at: ', dt.now())
         connection.rollback()
     else: 
         connection.commit()
         disconnectDB(connection)
         return
 
+def insertHistoricalPrice(type, date, price):
+    connection = connectDB()
+    cursor = connection.cursor()
+    try:
+        cursor.callproc('insert_historical_price',[type, date, price])
+    except: 
+        print('error in insert_historical_price at: ', dt.now())
+        connection.rollback()
+    else: 
+        connection.commit()
+        disconnectDB(connection)
+        return
 
 def getLatestCarbonFromDB():
     connection = connectDB()
@@ -54,7 +61,7 @@ def getLatestCarbonFromDB():
     try: 
         cursor.callproc('get_latest_carbon')
     except: 
-        print('error in getLatestCarbonFromDB at: ', time.now)
+        print('error in getLatestCarbonFromDB at: ', dt.now())
         connection.rollback()
         disconnectDB(connection)
         return
@@ -65,7 +72,7 @@ def getLatestCarbonFromDB():
                 disconnectDB(connection)
                 return r
         #hack for first row
-        return [0,0,0,0,0] 
+        return [0,0,0] 
 
 def getLatestSaltFromDB():
     connection = connectDB()
@@ -73,7 +80,7 @@ def getLatestSaltFromDB():
     try: 
         cursor.callproc('get_latest_salt')
     except:
-        print('error in getLatestSaltFromDB at: ', time.now)
+        print('error in getLatestSaltFromDB at: ', dt.now())
         connection.rollback()
         disconnectDB()
         return
@@ -84,7 +91,7 @@ def getLatestSaltFromDB():
                 disconnectDB(connection)
                 return r             
         #hack for empty table
-        return [0,0,0,0,0]
+        return [0,0,0]
 
 def getLatestNTA():
     connection = connectDB()
@@ -92,7 +99,7 @@ def getLatestNTA():
     try: 
         cursor.callproc('get_latest_nta')
     except:
-        print('error in getLatestNTA at: ', time.now)
+        print('error in getLatestNTA at: ', dt.now())
         connection.rollback()
         disconnectDB()
         return
@@ -103,7 +110,7 @@ def getLatestNTA():
                 disconnectDB(connection)
                 return r             
         #hack for empty table
-        return [0,0,0,0,0]
+        return [0,0,0]
 
 def getAllSaltFromDB():
     connection = connectDB()
@@ -111,7 +118,7 @@ def getAllSaltFromDB():
     try: 
         cursor.callproc('get_all_salt')
     except:
-        print('error in getAllSaltFromDB at: ', time.now)
+        print('error in getAllSaltFromDB at: ', dt.now())
         connection.rollback()
         disconnectDB()
         return
@@ -125,7 +132,7 @@ def getAllCarbonFromDB():
     try: 
         cursor.callproc('get_all_carbon')
     except:
-        print('error in getAllCarbonFromDB at: ', time.now)
+        print('error in getAllCarbonFromDB at: ', dt.now())
         connection.rollback()
         disconnectDB()
         return
@@ -149,3 +156,41 @@ def disconnectDB(connection):
     else: 
         print('database was already disconnected')
         return
+
+def getPriceWithDate(date, type):
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_price_with_date', [date, type])
+    except:
+        print('error in get_price_with_date at: ', dt.now())
+        connection.rollback()
+        disconnectDB()
+        return
+    else: 
+        result = cursor.fetchall()
+        for r in result:
+            if r is not None:
+                disconnectDB(connection)
+                return r             
+        #hack for empty table
+        return 'none'
+    
+def getPricesByDate(start, end, type):
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_prices_by_dates', [start, end, type])
+    except:
+        print('error in get_prices_by_date')
+        connection.rollback()
+        disconnectDB()
+        return
+    else: 
+        result = cursor.fetchall()
+        for r in result:
+            if r is not None:
+                disconnectDB(connection)
+                return r             
+        #hack for empty table
+        return 'none'
