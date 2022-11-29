@@ -3,6 +3,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import data_helpers as helper
 import time
 
 chrome_driver = '/Users/edirose/Desktop/drivers/chromedriver'
@@ -37,33 +38,18 @@ def getCarbonPrice(driver):
     except: 
         print('could not getCarbonPrice')
     finally:
-        return cp_raw
+        return helper.cleanPrice(cp_raw)
 
-def getSaltSharePrice(driver):   
+def getSaltPrice(driver):   
     driver.get("https://www.nzx.com/instruments/CO2")
     try:
-        ss = WebDriverWait(driver, 10).until(
+        ss_raw = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "/html/body/section/div[2]/div/section[1]/div/div[1]/h1"))
         ).text
     except: 
         print('could not getSaltSharePrice')
     finally:
-        return ss
-
-def getPrices():
-    driver = getHeadlessDriver()
-    try: 
-        cp_raw= getCarbonPrice(driver)
-    except:
-        print('get Carbon failed')
-    try: 
-         ss= getSaltSharePrice(driver)
-    except: 
-        print('getSaltShare failed')
-    finally: 
-        v=[ss, cp_raw]
-        driver.close()
-    return v
+        return helper.cleanPrice(ss_raw)
 
 
 def getHeadlessDriver():
@@ -82,6 +68,4 @@ def getSaltNTA():
     except: 
         print('could not getSaltSharePrice')
     finally:
-        return ss
-
-
+        return helper.cleanPrice(ss)

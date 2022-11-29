@@ -2,6 +2,7 @@ import pymysql as db
 import password
 from datetime import datetime as dt
 import calculations as calcs
+import data_helpers as helpers
 
 def insertCarbonPrice(carbon_current):
     connection = connectDB()
@@ -123,8 +124,10 @@ def getAllSaltFromDB():
         disconnectDB()
         return
     else: 
-        result_raw = cursor.fetchall()
-        return result_raw
+        result_raw = cursor.fetchall()[0][0]
+        refined = helpers.refinePricesForReports(result_raw)
+        disconnectDB()
+        return refined
 
 def getAllCarbonFromDB():
     connection = connectDB()
@@ -137,9 +140,10 @@ def getAllCarbonFromDB():
         disconnectDB()
         return
     else: 
-        result_raw = cursor.fetchall()
+        result_raw = cursor.fetchall()[0][0]
+        refined = helpers.refinePricesForReports(result_raw)
         disconnectDB(connection)
-        return result_raw
+        return refined
 
 def connectDB():
     connection = db.connect(host="localhost", port=3306, user="root", password=password.getPassword(), database="carbon_market_schema")
@@ -187,10 +191,6 @@ def getPricesByDate(start, end, type):
         disconnectDB()
         return
     else: 
-        result = cursor.fetchall()
-        for r in result:
-            if r is not None:
-                disconnectDB(connection)
-                return r             
-        #hack for empty table
-        return 'none'
+        result_raw = cursor.fetchall()[0][0]
+        refined = helpers.refinePricesForReports(result_raw)           
+        return refined

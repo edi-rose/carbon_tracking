@@ -16,7 +16,6 @@ def applyTransactionFee(cost, fee_decimal):
 def estimateNextSaltPrice(carbon_current, carbon_previous, salt_current):
     carbon_diff_percent = (carbon_current - carbon_previous) / carbon_previous
     salt_price_estimate = salt_current * (1 + (carbon_diff_percent * 0.9115))
-    print(salt_price_estimate)
     return salt_price_estimate
 
 
