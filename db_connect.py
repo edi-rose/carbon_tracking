@@ -4,46 +4,7 @@ from datetime import datetime as dt
 import calculations as calcs
 import data_helpers as helpers
 
-def insertCarbonPrice(carbon_current):
-    connection = connectDB()
-    cursor= connection.cursor()
-    try:  
-        cursor.callproc('insert_carbon',[carbon_current])
-    except: 
-        print('error in insertCarbonPrice at: ', dt.now())
-        connection.rollback()
-    else: 
-        connection.commit()
-        disconnectDB(connection)
-    return
-
-def insertSaltPrice(price):
-    connection = connectDB()
-    cursor = connection.cursor()
-    try:
-        cursor.callproc('insert_salt',[price])
-    except: 
-        print('error in insertSaltPrice at: ', dt.now())
-        connection.rollback()
-    else: 
-        connection.commit()
-        disconnectDB(connection)
-        return
-
-def insertNTA(nta):
-    connection = connectDB()
-    cursor = connection.cursor()
-    try:
-        cursor.callproc('insert_nta',[nta])
-    except: 
-        print('error in insert_nta at: ', dt.now())
-        connection.rollback()
-    else: 
-        connection.commit()
-        disconnectDB(connection)
-        return
-
-def insertHistoricalPrice(type, date, price):
+def insertPrice(type, date, price):
     connection = connectDB()
     cursor = connection.cursor()
     try:
@@ -169,7 +130,7 @@ def getPriceWithDate(date, type):
     except:
         print('error in get_price_with_date at: ', dt.now())
         connection.rollback()
-        disconnectDB()
+        disconnectDB(connection)
         return
     else: 
         result = cursor.fetchall()
@@ -188,9 +149,59 @@ def getPricesByDate(start, end, type):
     except:
         print('error in get_prices_by_date')
         connection.rollback()
-        disconnectDB()
+        disconnectDB(connection)
         return
     else: 
         result_raw = cursor.fetchall()[0][0]
         refined = helpers.refinePricesForReports(result_raw)           
         return refined
+
+def insertEvent(type, text, description, date):
+    connection = connectDB()
+    cursor = connection.cursor()
+    try:
+        cursor.callproc('insert_event',[type, text, description, date])
+    except connection.Error as error:
+        print("Failed to execute stored procedure: {}".format(error))
+        print('error in insert_event at: ', dt.now())
+        connection.rollback()
+        disconnectDB(connection)
+    else: 
+        connection.commit()
+        disconnectDB(connection)
+        return
+
+def getEventWithDateType(date, type):
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_event_by_date_type', [date, type])
+    except:
+        print('error in get_event_by_date_type at: ', dt.now())
+        connection.rollback()
+        disconnectDB(connection)
+        return
+    else: 
+        result = cursor.fetchall()
+        print(result)
+        for r in result:
+            if r is not None:
+                disconnectDB(connection)
+                return r             
+        #hack for empty table
+        return 'none'
+
+def getEventsByDateRangeType(start, end, type):
+    connection = connectDB()
+    cursor= connection.cursor()   
+    try: 
+        cursor.callproc('get_events_by_date_range_type', [start, end, type])
+    except connection.Error as error:
+        print("Failed to execute stored procedure: {}".format(error))
+        print('error in insert_event at: ', dt.now())
+        connection.rollback()
+        disconnectDB(connection)
+        return
+    else: 
+        result_raw = cursor.fetchall()
+        return result_raw
