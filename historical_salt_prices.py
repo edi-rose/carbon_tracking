@@ -1,6 +1,7 @@
 import db_connect as db
-# this file is only needed for one time addition of historical data. 
 
+# This file can be used to update the salt share price data, filling in gaps where I didn't run the bot
+# Update salt_price_dict with data from network tab on sharsies here: https://app.sharesies.nz/portfolio/co2
 
 salt_price_dict =  {
     "2018-11-19": 1.05,
@@ -884,7 +885,7 @@ salt_price_dict =  {
     "2022-11-17": 2.37
 }
 
-for key in salt_price_dict:
-    db_price = db.getPriceWithDate(key, 'carbon')
-    if(db_price =='none'):
-        db.insertHistoricalPrice('salt', key + " 00:00:00", salt_price_dict[key])
+# for key in salt_price_dict:
+#     db_price = db.getPriceWithDate(key, 'carbon')
+#     if(db_price =='none'):
+#         db.insertHistoricalPrice('salt', key + " 00:00:00", salt_price_dict[key])

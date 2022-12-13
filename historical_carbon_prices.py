@@ -3,8 +3,8 @@ import time
 from datetime import datetime
 import db_connect as db
 
-# this file is only needed for one time addition of historical data. 
-
+# This file is used to fill in the gaps of the carbon price data for when i forget to turn on the bot
+# Update the csv here: https://raw.githubusercontent.com/theecanmole/nzu/master/nzu-weekly-prices-data.csv
 
 data = []
 with open("historical_carbon_prices.csv") as csvfile:
@@ -21,4 +21,4 @@ for row in data:
 for key in dict(refined):
     db_price = db.getPriceWithDate(key, 'carbon')
     if(db_price =='none'):
-        db.insertHistoricalPrice('carbon', key + " 00:00:00", dict(refined)[key])
+        db.insertPrice('carbon', key + " 00:00:00", dict(refined)[key])
