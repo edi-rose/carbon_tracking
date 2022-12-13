@@ -29,7 +29,8 @@ def getCarbonIsOpen():
             print('GetCarbonIsOpen returned with unexpected status: ', isOpen)
             return False
 
-def getCarbonPrice(driver):
+def getCarbonPrice():
+    driver = getHeadlessDriver()
     driver.get("https://commtrade.co.nz")
     try:
         cp_raw = WebDriverWait(driver, 20).until(
@@ -40,7 +41,8 @@ def getCarbonPrice(driver):
     finally:
         return helper.cleanPrice(cp_raw)
 
-def getSaltPrice(driver):   
+def getSaltPrice():   
+    driver = getHeadlessDriver()
     driver.get("https://www.nzx.com/instruments/CO2")
     try:
         ss_raw = WebDriverWait(driver, 10).until(
@@ -69,3 +71,29 @@ def getSaltNTA():
         print('could not getSaltSharePrice')
     finally:
         return helper.cleanPrice(ss)
+
+def getAuctionDates():
+    driver = getHeadlessDriver()
+    driver.get("https://www.etsauctions.govt.nz/public/auction_noticeboard")
+    card_body_div = driver.find_element(By.CSS_SELECTOR, 'div.card-body')
+    elements = card_body_div.find_elements(By.TAG_NAME, 'a')
+    dates= []
+    links = []
+
+    for element in elements:
+        str = element.get_attribute('href')
+        links.append(str)
+
+    for link in links:
+        driver.get(link)
+        try:
+            date = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//*[@id='auction_information']/tbody/tr[3]/td"))
+            ).text
+        except:
+            continue
+        else:
+            dates.append(helper.changeDateFromSlashesToDashes(date))
+    driver.quit()
+    return dates
+
