@@ -52,8 +52,8 @@ def plotSaltAndCarbon(startDate="2000-01-01", endDate="2029-12-12"):
     saltAX = carbonAX.twinx()
     saltAX.set_xlabel('dates')
     saltAX.set_ylabel('Salt Share Price')
-    for date in auction_dates:
-        plt.axvline(x=date)
+    # for date in auction_dates:
+    #     plt.axvline(x=date)
     saltAX.plot(salt_data.keys(), salt_data.values(), color='red', label='salt')
 
 def plotAllSalt():
@@ -71,8 +71,8 @@ def plotAuctions(startDate, endDate, delta, type):
         keys = []
         for price in prices:
             keys.append((price - auction[0])/timedelta(days=1))
-
         plt.plot(keys, prices.values(), label=auction[0].strftime("%Y-%m-%d"))
+    plt.Axes.set_ylabel("Jarden Carbon Spot Price")
 
 def plotAuctionsSaltAndCarbon(startDate, endDate, delta):
     auction_dates = db.getEventsByDateRangeType(startDate,endDate, 'carbon_auction')  
@@ -94,15 +94,15 @@ def plotAuctionsSaltAndCarbon(startDate, endDate, delta):
         for carbon_price in carbon_prices:
             carbon_keys.append((carbon_price - auction[0])/timedelta(days=1))
         
-        carbonAX.plot(carbon_keys, carbon_prices.values(), color = 'blue', label='carbon')
-        saltAX.plot(salt_keys, salt_prices.values(), color='red', label='salt')
+        carbonAX.plot(carbon_keys, carbon_prices.values(), color = 'blue', label='Carbon')
+        saltAX.plot(salt_keys, salt_prices.values(), color='red', label='Salt')
 
 #plotAllNZX()
 #plotTwoPrices(db.getPricesByDate("2020-01-01","2022-12-01", 'carbon'), historical_salt.salt_price_dict,"2020-01-01","2022-12-01")
 
 plotAuctions('2015-01-01', '2024-01-01', 30, 'carbon')
-#plotSaltAndCarbon("2022-10-01","2022-12-10")
-plt.title('Price of Carbon in the 30 days before and after each auction')
+#plotSaltAndCarbon("2015-10-01","2022-12-15")
+plt.title('Carbon Spot Price, Salt Share Price')
 plt.legend()
 plt.show()
 
