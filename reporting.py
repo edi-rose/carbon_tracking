@@ -8,6 +8,10 @@ import historical_salt_prices as historical_salt
 import historical_carbon_prices as historical_carbon
 from datetime import timedelta, date
 
+def plotDiffSaltAndCarbon(start, end):
+    carbon_prices = db.getPricesByDate(start, end, 'carbon')
+    salt_prices = db.getPricesByDate(start, end, 'salt')
+
 def plotTwoPrices(dict1, dict2, startStr, endStr):
     dates = help.getDatesBetween(startStr, endStr)
     dates_final = []
@@ -45,12 +49,11 @@ def plotSaltAndCarbon(startDate="2000-01-01", endDate="2029-12-12"):
     carbon_data = db.getPricesByDate(startDate, endDate, 'carbon')
     salt_data = db.getPricesByDate(startDate, endDate, 'salt')
     carbonAX = plt.subplot()
-    carbonAX.set_xlabel('dates')
     carbonAX.set_ylabel('Carbon Price')
     carbonAX.plot(carbon_data.keys(), carbon_data.values(), color = 'blue', label='carbon')
     plt.legend(loc='upper center')
     saltAX = carbonAX.twinx()
-    saltAX.set_xlabel('dates')
+    saltAX.set_xlabel('')
     saltAX.set_ylabel('Salt Share Price')
     # for date in auction_dates:
     #     plt.axvline(x=date)
@@ -69,9 +72,11 @@ def plotAuctions(startDate, endDate, delta, type):
         afterAuction = auction[0] + timedelta(days=delta)
         prices = db.getPricesByDate(beforeAuction, afterAuction, type)
         keys = []
-        for price in prices:
-            keys.append((price - auction[0])/timedelta(days=1))
-        plt.plot(keys, prices.values(), label=auction[0].strftime("%Y-%m-%d"))
+        if prices is not None: 
+            for price in prices:
+                keys.append((price - auction[0])/timedelta(days=1))
+        
+            plt.plot(keys, prices.values(), label=auction[0].strftime("%Y-%m-%d"))
     plt.Axes.set_ylabel("Jarden Carbon Spot Price")
 
 def plotAuctionsSaltAndCarbon(startDate, endDate, delta):
@@ -100,9 +105,10 @@ def plotAuctionsSaltAndCarbon(startDate, endDate, delta):
 #plotAllNZX()
 #plotTwoPrices(db.getPricesByDate("2020-01-01","2022-12-01", 'carbon'), historical_salt.salt_price_dict,"2020-01-01","2022-12-01")
 
-plotAuctions('2015-01-01', '2024-01-01', 30, 'carbon')
-#plotSaltAndCarbon("2015-10-01","2022-12-15")
-plt.title('Carbon Spot Price, Salt Share Price')
+#plotAuctions('2015-01-01', '2024-01-01', 30, 'carbon')
+plotSaltAndCarbon("2001-08-25","2023-12-25")
+#plotSaltAndNZX('2022-01-01', "2022-12-25")
+plt.title('Carbon vs Salt')
 plt.legend()
 plt.show()
 

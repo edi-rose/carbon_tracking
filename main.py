@@ -1,4 +1,4 @@
-import priceGetters as web
+import api.headless_getters as web
 import numpy as np 
 import re
 import db_connect as db
@@ -12,14 +12,15 @@ def listen():
     # day/hour method doesnt work if im not in NZTS
     # day =  datetime.now().weekday() # 0 is Monday 6, is Sunday
     # hour = datetime.now().time().hour
-    marketIsOpen = web.getCarbonIsOpen()
+    #marketIsOpen =  #web.getCarbonIsOpen() 
+    marketIsOpen = True # for testing
     while True: 
-        if marketIsOpen == True:
+        if marketIsOpen:
             print('checking for new prices')
             try:
                 kickOff()
             except:
-                print('find price failed')
+                print('kickoff failed')
             finally:
                 print('check complete')
                 time.sleep(300)

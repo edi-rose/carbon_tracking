@@ -153,8 +153,11 @@ def getPricesByDate(start, end, type):
         return
     else: 
         result_raw = cursor.fetchall()[0][0]
-        refined = helpers.refinePricesForReports(result_raw)           
-        return refined
+        if result_raw: 
+            refined = helpers.refinePricesForReports(result_raw)           
+            return refined
+        else: 
+            return None
 
 def insertEvent(type, text, description, date):
     connection = connectDB()

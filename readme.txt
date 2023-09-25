@@ -2,7 +2,7 @@ This project tracks and analyses the New Zealand Carbon Market.
 The file db_connect.py makes calls to a mySQL database which is not available to the public. 
 In theory any one could pull my work and start scraping prices and storing them in their own DB. 
 The getters.py file uses selenium to webscrape the following: 
-    - Carbon Spot Price (https://www.commtrade.co.nz/)
+    - Carbon Spot Price (https://www.carbonnews.co.nz (daily) and https://www.commtrade.co.nz/ (high frequency *broken))
     - Salt Share Price (https://www.nzx.com/instruments/CO2)
     - Carbon Auction Announcements (https://www.etsauctions.govt.nz/public/auction_noticeboard)
 
