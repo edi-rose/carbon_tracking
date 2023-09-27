@@ -1,4 +1,7 @@
 This project tracks and analyses the New Zealand Carbon Market. 
+
+Referenced in Carbon News: https://www.carbonnews.co.nz/story.asp?storyID=28838&fbclid=IwAR3l9Sw3wd9WjaeRYV5DFKCgCfC43xfwzrkFij3YDrWx8rQUmTYhYLfcttI
+
 The file db_connect.py makes calls to a mySQL database which is not available to the public. 
 In theory any one could pull my work and start scraping prices and storing them in their own DB. 
 The getters.py file uses selenium to webscrape the following: 
